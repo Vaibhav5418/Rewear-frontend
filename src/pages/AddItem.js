@@ -66,11 +66,14 @@ function AddItem() {
     }
   };
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h2>Add New Item</h2>
-      {message && <p>{message}</p>}
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
+return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white rounded-2xl shadow-xl p-9 w-full max-w-md">
+      <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 tracking-wide">Add New Item</h2>
+      {message && (
+        <p className={`text-center font-medium mb-2 ${message.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>{message}</p>
+      )}
+      <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex flex-col gap-4">
         <input
           type="text"
           name="title"
@@ -78,53 +81,72 @@ function AddItem() {
           value={formData.title}
           onChange={handleChange}
           required
-        /><br /><br />
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
         <textarea
           name="description"
           placeholder="Description"
           value={formData.description}
           onChange={handleChange}
-        /><br /><br />
+          rows={3}
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-vertical"
+        />
         <input
           type="text"
           name="category"
           placeholder="Category"
           value={formData.category}
           onChange={handleChange}
-        /><br /><br />
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
         <input
           type="text"
           name="type"
           placeholder="Type"
           value={formData.type}
           onChange={handleChange}
-        /><br /><br />
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
         <input
           type="text"
           name="size"
           placeholder="Size"
           value={formData.size}
           onChange={handleChange}
-        /><br /><br />
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
         <input
           type="text"
           name="condition"
           placeholder="Condition"
           value={formData.condition}
           onChange={handleChange}
-        /><br /><br />
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
         <input
           type="text"
           name="tags"
           placeholder="Tags (comma-separated)"
           value={formData.tags}
           onChange={handleChange}
-        /><br /><br />
-        <input type="file" name="image" onChange={handleImageChange} /><br /><br />
-        <button type="submit">Upload Item</button>
+          className="p-3 rounded-lg border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
+        <input
+          type="file"
+          name="image"
+          onChange={handleImageChange}
+          className="text-base rounded-lg border border-gray-300 p-2"
+        />
+        <button
+          type="submit"
+          className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg py-3 text-lg font-semibold mt-2 shadow hover:from-indigo-600 hover:to-indigo-700 transition-all"
+        >
+          Upload Item
+        </button>
       </form>
     </div>
-  );
+  </div>
+);
 }
 
 export default AddItem;
