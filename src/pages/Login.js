@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://rewear-backend-bcfm.onrender.com/api/auth/login", formData);
+      const res = await axios.post(`${baseURL}/auth/login`, formData);
 
       const { token, user } = res.data;
       localStorage.setItem("token", token);

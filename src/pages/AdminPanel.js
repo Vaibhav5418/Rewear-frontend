@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function AdminPanel() {
   const [pendingItems, setPendingItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
@@ -8,13 +10,13 @@ function AdminPanel() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios.get("https://rewear-backend-bcfm.onrender.com/api/items/pending", {
+    axios.get(`${baseURL}/items/pending`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => setPendingItems(res.data))
       .catch(err => console.error("Pending fetch error:", err));
 
-    axios.get("http://rewear-backend-bcfm.onrender.com/api/items", {
+    axios.get(`${baseURL}/items`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => setAllItems(res.data))
@@ -25,7 +27,7 @@ function AdminPanel() {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.put(`http://rewear-backend-bcfm.onrender.com/api/items/approve/${id}`,
+      await axios.put(`${baseURL}/items/approve/${id}`,
         { approve },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -41,7 +43,7 @@ function AdminPanel() {
 
   const getImageUrl = (item) => {
     if (item.imageUrl && item.imageUrl.startsWith("/uploads/")) {
-      return `http://rewear-backend-bcfm.onrender.com${item.imageUrl}`;
+      return `${baseURL}${item.imageUrl}`;
     }
     return "https://via.placeholder.com/120?text=No+Image";
   };

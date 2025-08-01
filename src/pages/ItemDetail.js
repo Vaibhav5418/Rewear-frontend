@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function ItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ function ItemDetail() {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const res = await axios.get(`http://rewear-backend-bcfm.onrender.com/api/items/${id}`);
+        const res = await axios.get(`${baseURL}/items/${id}`);
         setItem(res.data);
       } catch (err) {
         console.error("Failed to fetch item:", err);
@@ -34,7 +36,7 @@ function ItemDetail() {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        `http://rewear-backend-bcfm.onrender.com/api/items/swap/${id}`,
+        `${baseURL}/items/swap/${id}`,
         { type },
         {
           headers: {
@@ -115,7 +117,7 @@ function ItemDetail() {
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                   <div className="relative bg-white rounded-2xl p-4 shadow-lg">
                     <img
-                      src={`http://rewear-backend-bcfm.onrender.com${item.imageUrl}`}
+                      src={`${baseURL}${item.imageUrl}`}
                       alt={item.title}
                       className={`w-full h-80 object-cover rounded-xl transition-all duration-500 ${
                         imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'

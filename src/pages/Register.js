@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function Register() {
   const [formData, setFormData] = useState({
     name: "",
@@ -19,7 +21,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://rewear-backend-bcfm.onrender.com/api/auth/register", formData);
+      await axios.post(`${baseURL}/auth/register`, formData);
       alert("Registration successful");
       navigate("/");
     } catch (err) {

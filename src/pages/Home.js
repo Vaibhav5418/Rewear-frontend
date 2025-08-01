@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function Home() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ function Home() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://rewear-backend-bcfm.onrender.com/api/items")
+      .get(`${baseURL}/items`)
       .then((res) => {
         setItems(res.data);
         setLoading(false);
@@ -159,7 +161,7 @@ function Home() {
                     {/* Enhanced Image container */}
                     <div className="relative mb-6 overflow-hidden rounded-2xl">
                       <img
-                        src={`http://rewear-backend-bcfm.onrender.com${item.imageUrl}`}
+                        src={`${baseURL}${item.imageUrl}`}
                         alt={item.title}
                         className="w-full h-56 object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                         onError={e => { 

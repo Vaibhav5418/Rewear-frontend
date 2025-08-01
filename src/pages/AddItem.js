@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function AddItem() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -42,7 +44,7 @@ function AddItem() {
     if (image) form.append("image", image);
 
     try {
-      const res = await axios.post("https://rewear-backend-bcfm.onrender.com/api/items", form, {
+      const res = await axios.post(`${baseURL}/items`, form, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,

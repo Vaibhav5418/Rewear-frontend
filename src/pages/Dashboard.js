@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [myItems, setMyItems] = useState([]);
@@ -17,12 +19,12 @@ function Dashboard() {
       }
 
       try {
-        const res = await axios.get("http://rewear-backend-bcfm.onrender.com/api/auth/user", {
+        const res = await axios.get(`${baseURL}/api/auth/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data.user);
 
-        const itemsRes = await axios.get("http://rewear-backend-bcfm.onrender.com/api/items/user", {
+        const itemsRes = await axios.get(`${baseURL}/items/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMyItems(itemsRes.data);
@@ -151,7 +153,7 @@ function Dashboard() {
                   >
                     <div className="relative overflow-hidden rounded-xl mb-4">
                       <img
-                        src={`http://rewear-backend-bcfm.onrender.com${item.imageUrl}`}
+                        src={`${baseURL}${item.imageUrl}`}
                         alt={item.title}
                         className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
                         onError={e => { e.target.src = "https://via.placeholder.com/100?text=No+Image"; }}
