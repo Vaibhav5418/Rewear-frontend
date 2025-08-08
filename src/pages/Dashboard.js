@@ -19,7 +19,7 @@ function Dashboard() {
       }
 
       try {
-        const res = await axios.get(`${baseURL}/api/auth/user`, {
+        const res = await axios.get(`${baseURL}/auth/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data.user);
@@ -153,7 +153,7 @@ function Dashboard() {
                   >
                     <div className="relative overflow-hidden rounded-xl mb-4">
                       <img
-                        src={`${baseURL}${item.imageUrl}`}
+                        src={item.imageUrl}
                         alt={item.title}
                         className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
                         onError={e => { e.target.src = "https://via.placeholder.com/100?text=No+Image"; }}

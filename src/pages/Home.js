@@ -12,9 +12,15 @@ function Home() {
 
   useEffect(() => {
     setLoading(true);
+    
+    // Fix the URL construction here too
+    const url = baseURL.includes('/api') ? `${baseURL}/items` : `${baseURL}/api/items`;
+    console.log("Fetching items from:", url);
+    
     axios
-      .get(`${baseURL}/items`)
+      .get(url)
       .then((res) => {
+        console.log("Items fetched:", res.data);
         setItems(res.data);
         setLoading(false);
       })
@@ -26,6 +32,19 @@ function Home() {
 
   const handleItemClick = (id) => {
     navigate(`/item/${id}`);
+  };
+
+  // Helper function to get the correct image URL
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return "https://via.placeholder.com/300x200/f1f5f9/64748b?text=No+Image";
+    
+    // If it's already a full URL (Cloudinary), use it as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // If it's a relative path, prepend baseURL
+    return `${baseURL}${imageUrl}`;
   };
 
   return (
@@ -161,11 +180,15 @@ function Home() {
                     {/* Enhanced Image container */}
                     <div className="relative mb-6 overflow-hidden rounded-2xl">
                       <img
-                        src={`${baseURL}${item.imageUrl}`}
+                        src={getImageUrl(item.imageUrl)}
                         alt={item.title}
                         className="w-full h-56 object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                        onError={e => { 
+                        onError={(e) => { 
+                          console.error("Image load error for item:", item._id, "URL:", item.imageUrl);
                           e.target.src = "https://via.placeholder.com/300x200/f1f5f9/64748b?text=No+Image"; 
+                        }}
+                        onLoad={() => {
+                          console.log("Image loaded successfully for item:", item._id);
                         }}
                       />
                       
@@ -188,6 +211,7 @@ function Home() {
                     <h4 className="font-bold text-slate-800 text-xl leading-tight group-hover:text-blue-700 transition-colors duration-500 relative z-10 mb-2">
                       {item.title}
                     </h4>
+
 
                     {/* Subtitle effect */}
                     <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 rounded-full"></div>

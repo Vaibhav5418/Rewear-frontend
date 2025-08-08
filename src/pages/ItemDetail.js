@@ -117,7 +117,13 @@ function ItemDetail() {
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                   <div className="relative bg-white rounded-2xl p-4 shadow-lg">
                     <img
-                      src={`${baseURL}${item.imageUrl}`}
+                      src={
+                        item.imageUrl && (item.imageUrl.startsWith('http://') || item.imageUrl.startsWith('https://'))
+                          ? item.imageUrl
+                          : item.imageUrl && item.imageUrl.startsWith('/uploads/')
+                            ? `${baseURL}${item.imageUrl}`
+                            : 'https://via.placeholder.com/300?text=No+Image'
+                      }
                       alt={item.title}
                       className={`w-full h-80 object-cover rounded-xl transition-all duration-500 ${
                         imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
@@ -146,6 +152,11 @@ function ItemDetail() {
                     {item.status === 'available' ? '🟢 Available' : '🔴 Unavailable'}
                   </span>
                 </div>
+              </div>
+              <div className="mt-4 text-center">
+                <span className="inline-block px-4 py-2 rounded-full bg-yellow-100 text-yellow-800 font-semibold border border-yellow-200 text-sm">
+                  🪙 Item Points: {item.points}
+                </span>
               </div>
 
               {/* Details Section */}
@@ -226,23 +237,7 @@ function ItemDetail() {
             {/* Action Buttons */}
             <div className="mt-8 pt-8 border-t border-gray-200">
               {item.status === "available" && item.isApproved ? (
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => handleAction("swap")}
-                    disabled={isLoading}
-                    className="group relative bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative flex items-center gap-2">
-                      {isLoading ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <span>🔄</span>
-                      )}
-                      Swap Request
-                    </div>
-                  </button>
-                  
+                <div className="flex justify-center">
                   <button
                     onClick={() => handleAction("redeem")}
                     disabled={isLoading}
@@ -258,18 +253,19 @@ function ItemDetail() {
                       Redeem via Points
                     </div>
                   </button>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-xl border border-gray-300">
+                  <span className="text-gray-500">🚫</span>
+                  <span className="text-gray-600 font-medium">
+                    This item is no longer available for redeem.
+                  </span>
                 </div>
-              ) : (
-                <div className="text-center">
-                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-xl border border-gray-300">
-                    <span className="text-gray-500">🚫</span>
-                    <span className="text-gray-600 font-medium">
-                      This item is no longer available for swap or redeem.
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
+
           </div>
         </div>
       </div>

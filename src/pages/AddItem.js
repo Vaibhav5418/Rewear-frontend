@@ -14,44 +14,99 @@ function AddItem() {
     size: "",
     condition: "",
     tags: "",
+    points: "",
   });
 
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        setMessage("❌ Please select a valid image file (JPG, JPEG, or PNG)");
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage("❌ File size must be less than 5MB");
+        return;
+      }
+      
+      setImage(file);
+      setMessage(""); // Clear any previous error messages
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You must be logged in to upload.");
-      navigate("/login");
-      return;
-    }
-
-    const form = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      form.append(key, value);
-    });
-    if (image) form.append("image", image);
+    setIsSubmitting(true);
+    setMessage("");
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setMessage("❌ You must be logged in to upload.");
+        navigate("/login");
+        return;
+      }
+
+      // Basic validation
+      if (!formData.title.trim()) {
+        setMessage("❌ Title is required");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!formData.points || formData.points <= 0) {
+        setMessage("❌ Points must be a positive number");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!image) {
+        setMessage("❌ Please select an image");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const form = new FormData();
+      
+      // Append form data with proper validation
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          form.append(key, value.toString().trim());
+        }
+      });
+      
+      form.append("image", image);
+
+      console.log("Submitting form data:", Object.fromEntries(form.entries()));
+
+      console.log("Base URL:", baseURL);
+      console.log("Full URL:", `${baseURL}/items`);
+
       const res = await axios.post(`${baseURL}/items`, form, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
+        timeout: 30000, // 30 second timeout
       });
 
+      console.log("Response:", res.data);
+
       setMessage("✅ Item listed successfully!");
+      
+      // Reset form
       setFormData({
         title: "",
         description: "",
@@ -60,11 +115,38 @@ function AddItem() {
         size: "",
         condition: "",
         tags: "",
+        points: "",
       });
       setImage(null);
+      
+      // Reset file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
+
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Failed to add item");
+      console.error("Submit error:", err);
+      
+      let errorMessage = "❌ Failed to add item";
+      
+      if (err.response) {
+        // Server responded with error status
+        console.error("Error response:", err.response.data);
+        errorMessage = err.response.data?.message || errorMessage;
+        
+        if (err.response.status === 401) {
+          errorMessage = "❌ Authentication failed. Please login again.";
+          navigate("/login");
+        } else if (err.response.status === 413) {
+          errorMessage = "❌ File too large. Please select a smaller image.";
+        }
+      } else if (err.request) {
+        // Network error
+        errorMessage = "❌ Network error. Please check your connection.";
+      }
+      
+      setMessage(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -104,7 +186,7 @@ function AddItem() {
               <input
                 type="text"
                 name="title"
-                placeholder="Title"
+                placeholder="Title *"
                 value={formData.title}
                 onChange={handleChange}
                 required
@@ -179,7 +261,20 @@ function AddItem() {
                 className="w-full p-4 rounded-xl border-2 border-gray-200 text-base bg-white/70 backdrop-blur-sm focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300 group-hover:border-purple-300 placeholder-gray-500"
               />
             </div>
-
+            
+            <div className="group">
+              <input
+                type="number"
+                name="points"
+                placeholder="Points *"
+                value={formData.points}
+                onChange={handleChange}
+                required
+                min="1"
+                className="w-full p-4 rounded-xl border-2 border-gray-200 text-base bg-white/70 backdrop-blur-sm focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300 group-hover:border-purple-300 placeholder-gray-500"
+              />
+            </div>
+            
             {/* Enhanced file input */}
             <div className="group">
               <div className="relative">
@@ -187,26 +282,46 @@ function AddItem() {
                   type="file"
                   name="image"
                   onChange={handleImageChange}
+                  accept="image/jpeg,image/jpg,image/png"
+                  required
                   className="w-full p-4 rounded-xl border-2 border-gray-200 text-base bg-white/70 backdrop-blur-sm focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300 group-hover:border-purple-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/5 to-indigo-500/5 pointer-events-none"></div>
               </div>
+              <p className="text-xs text-gray-500 mt-1">Max file size: 5MB. Allowed formats: JPG, JPEG, PNG</p>
             </div>
 
             {/* Enhanced submit button */}
             <button
               type="submit"
-              className="w-full relative overflow-hidden bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 text-white rounded-xl py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group"
+              disabled={isSubmitting}
+              className={`w-full relative overflow-hidden bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 text-white rounded-xl py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <span className="relative z-10 flex items-center justify-center">
-                <svg className="w-5 h-5 mr-2 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                Upload Item
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Upload Item
+                  </>
+                )}
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              {!isSubmitting && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              )}
             </button>
           </form>
         </div>

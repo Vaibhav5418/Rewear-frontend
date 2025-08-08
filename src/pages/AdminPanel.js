@@ -42,6 +42,9 @@ function AdminPanel() {
   };
 
   const getImageUrl = (item) => {
+    if (item.imageUrl && (item.imageUrl.startsWith('http://') || item.imageUrl.startsWith('https://'))) {
+      return item.imageUrl;
+    }
     if (item.imageUrl && item.imageUrl.startsWith("/uploads/")) {
       return `${baseURL}${item.imageUrl}`;
     }
