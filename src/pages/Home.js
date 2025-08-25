@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const baseURL = process.env.REACT_APP_BASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000/api";
 
 function Home() {
   const [items, setItems] = useState([]);
@@ -13,8 +13,7 @@ function Home() {
   useEffect(() => {
     setLoading(true);
     
-    // Fix the URL construction here too
-    const url = baseURL.includes('/api') ? `${baseURL}/items` : `${baseURL}/api/items`;
+    const url = `${baseURL}/items`;
     console.log("Fetching items from:", url);
     
     axios
@@ -43,8 +42,8 @@ function Home() {
       return imageUrl;
     }
     
-    // If it's a relative path, prepend baseURL
-    return `${baseURL}${imageUrl}`;
+    // If it's a relative path, prepend API origin
+    return `${new URL(baseURL).origin}${imageUrl}`;
   };
 
   return (

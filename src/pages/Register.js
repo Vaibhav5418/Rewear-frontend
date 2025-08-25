@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const baseURL = process.env.REACT_APP_BASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000/api";
 
 function Register() {
   const [step, setStep] = useState(1);

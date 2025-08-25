@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const baseURL = process.env.REACT_APP_BASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000/api";
 
 function AddItem() {
   const navigate = useNavigate();
@@ -66,7 +66,8 @@ function AddItem() {
         return;
       }
 
-      if (!formData.points || formData.points <= 0) {
+      const pointsNumber = Number(formData.points);
+      if (!Number.isFinite(pointsNumber) || pointsNumber <= 0) {
         setMessage("❌ Points must be a positive number");
         setIsSubmitting(false);
         return;
@@ -81,7 +82,7 @@ function AddItem() {
       const form = new FormData();
       
       // Append form data with proper validation
-      Object.entries(formData).forEach(([key, value]) => {
+      Object.entries({ ...formData, points: pointsNumber }).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
           form.append(key, value.toString().trim());
         }

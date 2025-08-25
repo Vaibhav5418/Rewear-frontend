@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const baseURL = process.env.REACT_APP_BASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000/api";
 
 function AdminPanel() {
   const [pendingItems, setPendingItems] = useState([]);
@@ -46,7 +46,7 @@ function AdminPanel() {
       return item.imageUrl;
     }
     if (item.imageUrl && item.imageUrl.startsWith("/uploads/")) {
-      return `${baseURL}${item.imageUrl}`;
+      return `${new URL(baseURL).origin}${item.imageUrl}`;
     }
     return "https://via.placeholder.com/120?text=No+Image";
   };

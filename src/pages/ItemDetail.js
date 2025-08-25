@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const baseURL = process.env.REACT_APP_BASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000/api";
 
 function ItemDetail() {
   const { id } = useParams();
@@ -121,7 +121,7 @@ function ItemDetail() {
                         item.imageUrl && (item.imageUrl.startsWith('http://') || item.imageUrl.startsWith('https://'))
                           ? item.imageUrl
                           : item.imageUrl && item.imageUrl.startsWith('/uploads/')
-                            ? `${baseURL}${item.imageUrl}`
+                            ? `${new URL(baseURL).origin}${item.imageUrl}`
                             : 'https://via.placeholder.com/300?text=No+Image'
                       }
                       alt={item.title}

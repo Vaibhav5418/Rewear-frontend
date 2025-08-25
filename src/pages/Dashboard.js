@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const baseURL = process.env.REACT_APP_BASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL || "http://localhost:5000/api";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -167,10 +167,9 @@ function Dashboard() {
                     
                     <div className="flex items-center space-x-2">
                       <div className={`w-3 h-3 rounded-full ${
-                        item.status === 'approved' ? 'bg-green-500' : 
-                        item.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'
+                        item.isApproved ? 'bg-green-500' : 'bg-yellow-500'
                       } animate-pulse`}></div>
-                      <p className="text-sm text-slate-600 capitalize">{item.status}</p>
+                      <p className="text-sm text-slate-600 capitalize">{item.isApproved ? 'approved' : 'pending'}</p>
                     </div>
                   </div>
                 ))}
